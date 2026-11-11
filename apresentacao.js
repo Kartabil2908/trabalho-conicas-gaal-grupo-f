@@ -1,6 +1,8 @@
 const obterElemento = (id) => document.getElementById(id);
 const canvas = obterElemento("graph");
 const contextoGrafico = canvas.getContext("2d");
+
+// Dados compartilhados entre o desenho, a tabela e a interacao com o grafico.
 let pontosCalculados = [];
 let atualizacaoPendente = false;
 let marcadoresInterativos = [];
@@ -15,7 +17,7 @@ function ocultarDicaInterativa() {
   obterElemento("hover-dot").hidden = true;
 }
 
-// Define os formatos numericos usados nos resultados.
+// As saidas usam casas decimais fixas; as formulas usam apenas as necessarias.
 const formatadoresDeNumero = Array.from(
   { length: 5 },
   (_, digits) =>
@@ -39,6 +41,7 @@ function agendarAtualizacaoTabela() {
   }
 }
 
+// Gera pontos dos dois ramos e dos lados superior e inferior da curva.
 function gerarPontosDaHiperbole(
   centroX,
   centroY,
@@ -88,7 +91,8 @@ function atualizarTabela() {
     )
     .join("");
 }
-// Atualiza o grafico, as formulas e os pontos exibidos.
+
+// Le os controles e atualiza o grafico, as formulas e as coordenadas.
 function atualizarVisualizacao() {
   atualizacaoPendente = false;
   ocultarDicaInterativa();
@@ -133,6 +137,7 @@ function atualizarVisualizacao() {
   const pixelWidth = Math.round(width * devicePixelRatio);
   const pixelHeight = Math.round(height * devicePixelRatio);
 
+  // Ajusta a resolucao interna do canvas para telas de alta densidade.
   if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
     canvas.width = pixelWidth;
     canvas.height = pixelHeight;
@@ -142,10 +147,12 @@ function atualizarVisualizacao() {
   contextoGrafico.clearRect(0, 0, width, height);
 
   const escalaGrafico = Math.min((width - 52) / 24, (height - 48) / 12);
+  // Mantem a mesma escala nos dois eixos e centraliza a origem no canvas.
   const converterXParaTela = (x) => width / 2 + x * escalaGrafico;
   const converterYParaTela = (y) => height / 2 - y * escalaGrafico;
   configuracaoGrafico = { width, height };
 
+  // Desenha uma linha ligando pontos do plano, convertidos para pixels.
   function desenharLinha(pontos, color, lineWidth = 1, dash = []) {
     contextoGrafico.beginPath();
     contextoGrafico.strokeStyle = color;
@@ -172,6 +179,7 @@ function atualizarVisualizacao() {
   const limiteVisivelY = (height / 2 - 20) / escalaGrafico;
   const intervaloGrade = width < 450 ? 4 : 2;
 
+  // Desenha a grade, os eixos e os valores visiveis.
   for (
     let x = Math.ceil(-limiteVisivelX / intervaloGrade) * intervaloGrade;
     x < limiteVisivelX;
@@ -244,6 +252,7 @@ function atualizarVisualizacao() {
   contextoGrafico.rect(16, 16, width - 32, height - 32);
   contextoGrafico.clip();
 
+  // Os elementos do grafico ficam dentro da area delimitada pelo canvas.
   if (obterElemento("assintotas").checked) {
     for (const sentido of [-1, 1]) {
       desenharLinha(
@@ -273,6 +282,7 @@ function atualizarVisualizacao() {
     );
   }
 
+  // Reordena os pontos para ligar cada ramo sem cruzar a curva.
   for (const lado of [-1, 1]) {
     const base = lado < 0 ? 0 : 2 * n - 1;
     const ramo = [];
@@ -312,6 +322,7 @@ function atualizarVisualizacao() {
     }
   }
 
+  // Adiciona focos, vertices e centro ao desenho e a lista de alvos interativos.
   function desenharMarcador(x, y, label, color, diamond) {
     const px = converterXParaTela(x);
     const py = converterYParaTela(y);
@@ -356,6 +367,7 @@ function atualizarVisualizacao() {
   desenharMarcador(h, k, "C", coresTema["--muted"], false);
   contextoGrafico.restore();
 
+  // Atualiza as expressoes da hiperbole e os valores derivados dos parametros.
   const formatarTermo = (value, name) =>
     value === 0
       ? name
@@ -477,6 +489,7 @@ function atualizarDicaInterativa() {
 
   const { x: cursorX, y: cursorY } = posicaoPonteiro;
   const { width, height } = configuracaoGrafico;
+  // Ignora alvos fora da area desenhada e procura primeiro marcadores proximos.
   const estaDentroDoGrafico = (point) =>
     point.px >= 16 &&
     point.px <= width - 16 &&
@@ -508,6 +521,7 @@ function atualizarDicaInterativa() {
   } else {
     let distanciaMinima = 10;
 
+    // Projeta o cursor em cada segmento para achar o ponto mais proximo da curva.
     for (const ramo of ramosInterativos) {
       for (let i = 1; i < ramo.pontos.length; i++) {
         const pontoInicial = ramo.pontos[i - 1];
@@ -591,7 +605,7 @@ canvas.addEventListener("pointerdown", (event) => {
   atualizarDicaInterativa();
 });
 
-// Agrupa mudancas proximas em um unico redesenho.
+// Agrupa eventos rapidos em um redesenho por quadro do navegador.
 function agendarAtualizacaoVisual() {
   if (!atualizacaoPendente) {
     atualizacaoPendente = true;
@@ -603,6 +617,7 @@ document.querySelectorAll("input").forEach((element) => {
   element.addEventListener("input", agendarAtualizacaoVisual);
 });
 
+// Restaura os valores iniciais dos controles.
 obterElemento("reset").onclick = () => {
   for (const [id, value] of Object.entries({ a: 3, b: 2, h: 0, k: 0, n: 150 })) {
     obterElemento(id).value = value;
@@ -610,6 +625,7 @@ obterElemento("reset").onclick = () => {
   agendarAtualizacaoVisual();
 };
 
+// Gera e baixa um CSV com todos os pontos calculados.
 obterElemento("csv").onclick = () => {
   atualizarVisualizacao();
   const csv = ["x,y", ...pontosCalculados.map((point) => point.join(","))].join("\n");
@@ -626,6 +642,7 @@ obterElemento("csv").onclick = () => {
 obterElemento("table-details").addEventListener("toggle", atualizarTabela);
 new ResizeObserver(agendarAtualizacaoVisual).observe(canvas.parentElement);
 
+// Aplica o tema escolhido e guarda a preferencia para a proxima visita.
 function aplicarTema(value) {
   document.documentElement.dataset.theme = value;
   for (const temaSelecionado of ["light", "dark"]) {
@@ -655,6 +672,7 @@ const temaPreferido = matchMedia("(prefers-color-scheme: light)").matches
   : "dark";
 aplicarTema(temaSalvo === "light" || temaSalvo === "dark" ? temaSalvo : temaPreferido);
 
+// Alterna a tela inteira; mostra uma alternativa caso o navegador nao permita.
 obterElemento("fullscreen").onclick = async () => {
   try {
     if (document.fullscreenElement) {
