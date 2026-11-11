@@ -1,0 +1,407 @@
+:root {
+  color-scheme: dark;
+  --fg: #e8eef8;
+  --bg: #101722;
+  --panel: #182331;
+  --border: #304155;
+  --curve: #63d6ff;
+  --button: #273b50;
+  --axis: #7f90a6;
+  --muted: #bac9dc;
+  --focus: #fb95b1;
+  --vertex: #71e4b0;
+  --asym: #f4c765;
+  --grid: #253346;
+  font-family: system-ui, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --fg: #102033;
+  --bg: #ffffff;
+  --panel: #f0f4fa;
+  --border: #b8c6d8;
+  --curve: #0752c7;
+  --button: #e4ecf8;
+  --axis: #53657d;
+  --muted: #34465e;
+  --focus: #b00055;
+  --vertex: #006b3d;
+  --asym: #a34300;
+  --grid: #d1dae6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.topbar h1 {
+  margin: 4px 0;
+  font-size: 23px;
+}
+
+.topbar small {
+  letter-spacing: 0.12em;
+}
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.toolbar button[aria-pressed="true"] {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 24px;
+}
+
+.controls {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--panel);
+}
+
+h2 {
+  margin: 0 0 24px;
+  font-size: 18px;
+}
+
+.field {
+  margin-bottom: 24px;
+}
+
+.field label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+output {
+  color: var(--curve);
+  font-variant-numeric: tabular-nums;
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--curve);
+  cursor: ew-resize;
+}
+
+input[type="checkbox"] {
+  accent-color: var(--curve);
+}
+
+.toggles {
+  display: grid;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.plot {
+  min-width: 0;
+}
+
+.formula-label {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.equation {
+  display: flex;
+  min-height: 85px;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 8px;
+  font-size: clamp(20px, 2vw, 30px);
+}
+
+.frac {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.frac > span:first-child {
+  padding: 0 10px 5px;
+  border-bottom: 1px solid currentColor;
+}
+
+.frac > span:last-child {
+  padding-top: 5px;
+}
+
+.derivation {
+  display: flex;
+  gap: 12px 28px;
+  flex-wrap: wrap;
+  padding: 14px 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.derivation strong {
+  color: var(--fg);
+  font-weight: 500;
+}
+
+.canvas-wrap {
+  position: relative;
+  height: clamp(340px, calc(100vh - 300px), 850px);
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.chart-tip {
+  position: absolute;
+  z-index: 2;
+  max-width: calc(100% - 16px);
+  padding: 12px 16px;
+  border: 1px solid var(--axis);
+  border-radius: 10px;
+  background: var(--panel);
+  box-shadow: 0 4px 18px #0002;
+  color: var(--fg);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.55;
+  pointer-events: none;
+  white-space: pre-line;
+}
+
+.hover-dot {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  transform: translate(-50%, -50%);
+  border: 2px solid var(--fg);
+  border-radius: 50%;
+  background: var(--panel);
+  pointer-events: none;
+}
+
+.hover-help {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.legend,
+.metrics,
+.actions {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+
+.legend {
+  gap: 24px;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.metrics {
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: 16px;
+}
+
+.metrics strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.point-groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin: 22px 0;
+}
+
+#elements {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.point-group h3 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+
+.point-group h3.vertex-title {
+  color: var(--vertex);
+}
+
+.point-group h3.focus-title {
+  color: var(--focus);
+}
+
+.point-row {
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+}
+
+.point-row strong {
+  font-weight: 600;
+}
+
+.point-formula {
+  margin: 5px 0;
+  color: var(--muted);
+}
+
+.point-coordinates {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.point-coordinates span {
+  white-space: nowrap;
+}
+
+.point-group .precision {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.general {
+  overflow-wrap: anywhere;
+  line-height: 1.7;
+}
+
+details {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid var(--border);
+}
+
+summary {
+  cursor: pointer;
+}
+
+p,
+li {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+small {
+  color: var(--muted);
+}
+
+.table-wrap {
+  max-height: 220px;
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 7px;
+  border-bottom: 1px solid var(--border);
+  text-align: right;
+}
+
+button {
+  padding: 9px 14px;
+  border: 1px solid var(--axis);
+  border-radius: 8px;
+  background: var(--button);
+  color: var(--fg);
+  font: inherit;
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--curve);
+  outline-offset: 4px;
+}
+
+#status {
+  color: var(--muted);
+}
+
+@media (max-width: 700px) {
+  body {
+    padding: 10px;
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .controls h2,
+  .toggles {
+    grid-column: 1 / -1;
+  }
+
+  .field {
+    margin: 0;
+  }
+
+  .canvas-wrap {
+    height: 360px;
+  }
+
+  .equation {
+    gap: 10px;
+  }
+
+  .topbar h1 {
+    font-size: 20px;
+  }
+
+  .point-groups {
+    grid-template-columns: 1fr;
+  }
+}

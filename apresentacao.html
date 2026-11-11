@@ -1,88 +1,738 @@
 <!doctype html>
 <html lang="pt-BR">
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Hipérbole • Grupo F</title>
-<style>
-:root{color-scheme:dark;--fg:#e8eef8;--bg:#101722;--panel:#182331;--border:#304155;--curve:#63d6ff;--button:#273b50;--axis:#7f90a6;--muted:#bac9dc;--focus:#fb95b1;--vertex:#71e4b0;--asym:#f4c765;--grid:#253346;font-family:system-ui,sans-serif;color:var(--fg);background:var(--bg)}*{box-sizing:border-box}body{margin:0;padding:20px}.layout{display:grid;grid-template-columns:240px minmax(0,1fr);gap:24px}.controls{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:20px}h2{font-size:18px;margin:0 0 24px}.field{margin-bottom:24px}.field label{display:flex;justify-content:space-between;margin-bottom:10px}output{color:var(--curve);font-variant-numeric:tabular-nums}input[type=range]{width:100%;accent-color:var(--curve);cursor:ew-resize}.toggles{display:grid;gap:12px;font-size:14px}input[type=checkbox]{accent-color:var(--curve)}.plot{min-width:0}.equation{text-align:center;font-size:19px;min-height:50px;padding:8px}.canvas-wrap{height:470px}canvas{width:100%;height:100%;display:block}.legend,.metrics,.actions{display:flex;flex-wrap:wrap;gap:18px;margin:16px 0}.legend{font-size:18px;font-weight:500;gap:24px;line-height:1.6}.metrics{border-top:1px solid var(--border);padding-top:16px;font-size:14px}.metrics strong{display:block;font-size:22px;margin-top:6px;font-weight:500}button{font:inherit;background:var(--button);color:var(--fg);border:1px solid var(--axis);padding:9px 14px;border-radius:8px;cursor:pointer}button:focus-visible,input:focus-visible{outline:2px solid var(--curve);outline-offset:4px}details{margin-top:20px;border-top:1px solid var(--border);padding-top:15px}summary{cursor:pointer}p,li{line-height:1.6;color:var(--muted)}small{color:var(--muted)}.table-wrap{max-height:220px;overflow:auto}table{width:100%;border-collapse:collapse}th,td{text-align:right;padding:7px;border-bottom:1px solid var(--border)}@media(max-width:700px){body{padding:10px}.layout{grid-template-columns:1fr}.controls{display:grid;grid-template-columns:1fr 1fr;gap:16px}.controls h2,.toggles{grid-column:1/-1}.field{margin:0}.canvas-wrap{height:360px}.equation{font-size:16px}}
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hipérbole • Grupo F</title>
+  <link rel="stylesheet" href="apresentacao.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <small>GAAL · GRUPO F</small>
+        <h1>Laboratório de hipérboles</h1>
+      </div>
+      <div class="toolbar">
+        <button id="light" aria-pressed="false">Claro</button>
+        <button id="dark" aria-pressed="true">Escuro</button>
+        <button id="fullscreen">Tela inteira</button>
+      </div>
+    </header>
 
-:root[data-theme="light"]{color-scheme:light;--fg:#102033;--bg:#ffffff;--panel:#f0f4fa;--border:#b8c6d8;--curve:#0752c7;--button:#e4ecf8;--axis:#53657d;--muted:#34465e;--focus:#b00055;--vertex:#006b3d;--asym:#a34300;--grid:#d1dae6}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}.topbar h1{font-size:23px;margin:4px 0}.topbar small{letter-spacing:.12em}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.toolbar button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}body{min-height:100vh}.canvas-wrap{height:clamp(340px,calc(100vh - 300px),850px)}.equation{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;font-size:clamp(20px,2vw,30px);min-height:85px}.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle}.frac>span:first-child{border-bottom:1px solid currentColor;padding:0 10px 5px}.frac>span:last-child{padding-top:5px}.derivation{padding:14px 0;display:flex;gap:12px 28px;flex-wrap:wrap;color:var(--muted);font-size:15px}.derivation strong{color:var(--fg);font-weight:500}.general{line-height:1.7;overflow-wrap:anywhere}.formula-label{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}#status{color:var(--muted)}@media(max-width:700px){.canvas-wrap{height:360px}.equation{gap:10px}.topbar h1{font-size:20px}}
+    <div id="status" role="status"></div>
 
-.canvas-wrap{position:relative}.chart-tip{position:absolute;z-index:2;pointer-events:none;background:var(--panel);color:var(--fg);border:1px solid var(--axis);border-radius:10px;padding:12px 16px;font-size:16px;line-height:1.55;box-shadow:0 4px 18px #0002;white-space:pre-line;max-width:calc(100% - 16px);font-variant-numeric:tabular-nums}.hover-dot{position:absolute;width:12px;height:12px;border:2px solid var(--fg);background:var(--panel);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none}.metrics{font-size:16px}#elements{font-size:16px;line-height:1.6}.hover-help{font-size:14px;color:var(--muted);margin:6px 0 0}
+    <main>
+      <div class="layout">
+        <section class="controls" aria-label="Parâmetros">
+          <h2>Explore os parâmetros</h2>
 
-.point-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin:22px 0}.point-group h3{font-size:18px;margin:0 0 12px}.point-group h3.vertex-title{color:var(--vertex)}.point-group h3.focus-title{color:var(--focus)}.point-row{padding:12px 0;border-top:1px solid var(--border)}.point-row strong{font-weight:600}.point-formula{color:var(--muted);margin:5px 0}.point-coordinates{display:flex;gap:24px;flex-wrap:wrap;font-variant-numeric:tabular-nums}.point-coordinates span{white-space:nowrap}.point-group .precision{font-size:14px;color:var(--muted);margin:8px 0 0}@media(max-width:700px){.point-groups{grid-template-columns:1fr}}
-</style>
-<header class="topbar"><div><small>GAAL · GRUPO F</small><h1>Laboratório de hipérboles</h1></div><div class="toolbar"><button id="light" aria-pressed="false">Claro</button><button id="dark" aria-pressed="true">Escuro</button><button id="fullscreen">Tela inteira</button></div></header><div id="status" role="status"></div><div class="layout"><section class="controls" aria-label="Parâmetros"><h2>Explore os parâmetros</h2>
-<div class="field"><label for="a">Semieixo a <output id="oa"></output></label><input id="a" type="range" min="0.5" max="6" step="0.1" value="3"></div>
-<div class="field"><label for="b">Semieixo b <output id="ob"></output></label><input id="b" type="range" min="0.5" max="6" step="0.1" value="2"></div>
-<div class="field"><label for="h">Centro h <output id="oh"></output></label><input id="h" type="range" min="-5" max="5" step="0.1" value="0"></div>
-<div class="field"><label for="k">Centro k <output id="ok"></output></label><input id="k" type="range" min="-5" max="5" step="0.1" value="0"></div>
-<div class="field"><label for="n">Amostras por lado <output id="on"></output></label><input id="n" type="range" min="10" max="400" step="10" value="150"></div>
-<div class="toggles"><label><input id="focos" type="checkbox" checked>Focos ◆</label><label><input id="vertices" type="checkbox" checked>Vértices ●</label><label><input id="assintotas" type="checkbox" checked>Assíntotas tracejadas</label><label><input id="retangulo" type="checkbox" checked>Retângulo auxiliar</label><label><input id="pontos" type="checkbox">Pontos calculados</label></div></section>
-<section class="plot"><div class="formula-label">Equação da hipérbole</div><div id="equation" class="equation"></div><div id="substitution" class="derivation"></div><div class="canvas-wrap"><canvas id="graph" role="img" aria-label="Hipérbole horizontal"></canvas><div id="hover-dot" class="hover-dot" hidden></div><div id="chart-tip" class="chart-tip" role="tooltip" hidden></div></div><p class="hover-help">Passe o mouse ou toque na curva, nos focos e nos vértices para ver as coordenadas.</p><div class="legend"><span style="color:var(--curve)">━ Hipérbole</span><span style="color:var(--focus)">◆ Focos</span><span style="color:var(--vertex)">● Vértices</span><span style="color:var(--asym)">┄ Assíntotas</span></div><div class="metrics"><div>Distância focal c<strong id="mc"></strong></div><div>Excentricidade c/a<strong id="me"></strong></div><div>Pontos armazenados<strong id="mp"></strong></div></div><div id="elements" class="point-groups"></div><details open><summary>Como os valores entram na expressão</summary><div id="results" class="general"></div></details><div class="actions"><button id="reset">Restaurar exemplo 3 × 2</button><button id="csv">Baixar pontos em CSV</button></div></section></div>
-<details><summary>Como a curva é construída</summary><ol><li>Entrada: semieixos positivos a e b e centro (h, k).</li><li>Percorremos distâncias d de a até 20. Calculamos x = h ± d e y = k ± b√((d/a)² − 1).</li><li>Armazenamos os pares (x, y) e ordenamos cada ramo pela coordenada y.</li><li>Ligamos os pontos de cada ramo separadamente. Mais amostras melhoram a aproximação.</li></ol><p>Os dois eixos têm a mesma escala. A janela permanece fixa ao alterar os semieixos; pontos fora dela continuam na tabela e no CSV. O cálculo é executado diretamente no navegador, sem conexão com a internet.</p></details>
-<details id="table-details"><summary>Coordenadas calculadas</summary><div class="table-wrap"><table><thead><tr><th>x</th><th>y</th></tr></thead><tbody id="rows"></tbody></table></div></details>
+          <div class="field">
+            <label for="a">Semieixo a <output id="oa"></output></label>
+            <input id="a" type="range" min="0.5" max="6" step="0.1" value="3">
+          </div>
+          <div class="field">
+            <label for="b">Semieixo b <output id="ob"></output></label>
+            <input id="b" type="range" min="0.5" max="6" step="0.1" value="2">
+          </div>
+          <div class="field">
+            <label for="h">Centro h <output id="oh"></output></label>
+            <input id="h" type="range" min="-5" max="5" step="0.1" value="0">
+          </div>
+          <div class="field">
+            <label for="k">Centro k <output id="ok"></output></label>
+            <input id="k" type="range" min="-5" max="5" step="0.1" value="0">
+          </div>
+          <div class="field">
+            <label for="n">Amostras por lado <output id="on"></output></label>
+            <input id="n" type="range" min="10" max="400" step="10" value="150">
+          </div>
+
+          <div class="toggles">
+            <label><input id="focos" type="checkbox" checked> Focos ◆</label>
+            <label><input id="vertices" type="checkbox" checked> Vértices ●</label>
+            <label><input id="assintotas" type="checkbox" checked> Assíntotas tracejadas</label>
+            <label><input id="retangulo" type="checkbox" checked> Retângulo auxiliar</label>
+            <label><input id="pontos" type="checkbox"> Pontos calculados</label>
+          </div>
+        </section>
+
+        <section class="plot" aria-label="Gráfico e propriedades da hipérbole">
+          <div class="formula-label">Equação da hipérbole</div>
+          <div id="equation" class="equation"></div>
+          <div id="substitution" class="derivation"></div>
+
+          <div class="canvas-wrap">
+            <canvas id="graph" role="img" aria-label="Hipérbole horizontal"></canvas>
+            <div id="hover-dot" class="hover-dot" hidden></div>
+            <div id="chart-tip" class="chart-tip" role="tooltip" hidden></div>
+          </div>
+
+          <p class="hover-help">
+            Passe o mouse ou toque na curva, nos focos e nos vértices para ver as coordenadas.
+          </p>
+
+          <div class="legend">
+            <span style="color: var(--curve)">━ Hipérbole</span>
+            <span style="color: var(--focus)">◆ Focos</span>
+            <span style="color: var(--vertex)">● Vértices</span>
+            <span style="color: var(--asym)">┄ Assíntotas</span>
+          </div>
+
+          <div class="metrics">
+            <div>Distância focal c<strong id="mc"></strong></div>
+            <div>Excentricidade c/a<strong id="me"></strong></div>
+            <div>Pontos armazenados<strong id="mp"></strong></div>
+          </div>
+
+          <div id="elements" class="point-groups"></div>
+
+          <details open>
+            <summary>Como os valores entram na expressão</summary>
+            <div id="results" class="general"></div>
+          </details>
+
+          <div class="actions">
+            <button id="reset">Restaurar exemplo 3 × 2</button>
+            <button id="csv">Baixar pontos em CSV</button>
+          </div>
+        </section>
+      </div>
+
+      <details>
+        <summary>Como a curva é construída</summary>
+        <ol>
+          <li>Entrada: semieixos positivos a e b e centro (h, k).</li>
+          <li>
+            Percorremos distâncias d de a até 20. Calculamos x = h ± d e
+            y = k ± b√((d/a)² − 1).
+          </li>
+          <li>Armazenamos os pares (x, y) e ordenamos cada ramo pela coordenada y.</li>
+          <li>Ligamos os pontos de cada ramo separadamente. Mais amostras melhoram a aproximação.</li>
+        </ol>
+        <p>
+          Os dois eixos têm a mesma escala. A janela permanece fixa ao alterar os semieixos;
+          pontos fora dela continuam na tabela e no CSV. O cálculo é executado diretamente no
+          navegador, sem conexão com a internet.
+        </p>
+      </details>
+
+      <details id="table-details">
+        <summary>Coordenadas calculadas</summary>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>x</th><th>y</th></tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </details>
+    </main>
 <script>
-const $=id=>document.getElementById(id),canvas=$('graph'),ctx=canvas.getContext('2d');let stored=[],pending=false;
-let hitMarkers=[],hitBranches=[],chartView=null,hoverFrame=0,pointer=null;
-function hideHover(){pointer=null;$("chart-tip").hidden=true;$("hover-dot").hidden=true;}
-const numberFormats=Array.from({length:5},(_,d)=>new Intl.NumberFormat('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d}));
-const fmt=(v,d=2)=>numberFormats[d].format(v);
-const compactFormat=new Intl.NumberFormat('pt-BR',{maximumFractionDigits:4});
+const $ = (id) => document.getElementById(id);
+const canvas = $("graph");
+const ctx = canvas.getContext("2d");
+let stored = [];
+let pending = false;
+let hitMarkers = [];
+let hitBranches = [];
+let chartView = null;
+let hoverFrame = 0;
+let pointer = null;
+
+function hideHover() {
+  pointer = null;
+  $("chart-tip").hidden = true;
+  $("hover-dot").hidden = true;
+}
+
+const numberFormats = Array.from(
+  { length: 5 },
+  (_, digits) =>
+    new Intl.NumberFormat("pt-BR", {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
+    }),
+);
+const fmt = (value, digits = 2) => numberFormats[digits].format(value);
+const compactFormat = new Intl.NumberFormat("pt-BR", {
+  maximumFractionDigits: 4,
+});
+
 let tableTimer;
-function updateTableLater(){clearTimeout(tableTimer);if($('table-details').open)tableTimer=setTimeout(table,140);}
-function calcularPontos(h,k,a,b,limite,n){const pts=[];for(const lado of [-1,1])for(let i=0;i<n;i++){const d=a+(limite-a)*i/(n-1),x=h+lado*d,altura=b*Math.sqrt(Math.max(0,(d/a)**2-1));pts.push([x,k+altura]);if(altura!==0)pts.push([x,k-altura]);}return pts;}
-function table(){if($('table-details').open)$('rows').innerHTML=stored.map(([x,y])=>`<tr><td>${fmt(x,4)}</td><td>${fmt(y,4)}</td></tr>`).join('');}
-function draw(){pending=false;hideHover();hitMarkers=[];hitBranches=[];const styles=getComputedStyle(document.documentElement),palette=Object.fromEntries(['--fg', '--bg', '--panel', '--border', '--curve', '--button', '--axis', '--muted', '--focus', '--vertex', '--asym', '--grid'].map(key=>[key,styles.getPropertyValue(key).trim()]));const a=+$('a').value,b=+$('b').value,h=+$('h').value,k=+$('k').value,n=+$('n').value,c=Math.hypot(a,b);for(const id of ['a','b','h','k','n'])$('o'+id).value=fmt(+$(id).value,id==='n'?0:1);stored=calcularPontos(h,k,a,b,20,n);
-const w=canvas.clientWidth,H=canvas.clientHeight,dpr=window.devicePixelRatio||1;if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(H*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(H*dpr);}ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,H);const scale=Math.min((w-52)/24,(H-48)/12),X=x=>w/2+x*scale,Y=y=>H/2-y*scale;chartView={w,H,scale,X,Y};
-function line(points,color,width=1,dash=[]){ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=width;ctx.setLineDash(dash);points.forEach(([x,y],i)=>i?ctx.lineTo(X(x),Y(y)):ctx.moveTo(X(x),Y(y)));ctx.stroke();ctx.setLineDash([]);}
-function text(x,y,t){ctx.fillStyle=palette["--muted"];ctx.font='14px system-ui';ctx.fillText(t,x,y);}
-const maxX=(w/2-20)/scale,maxY=(H/2-20)/scale,step=w<450?4:2;for(let x=Math.ceil(-maxX/step)*step;x<maxX;x+=step){line([[x,-maxY],[x,maxY]],palette["--grid"]);if(x)text(X(x)+3,Y(0)+16,''+x);}for(let y=Math.ceil(-maxY/step)*step;y<maxY;y+=step){line([[-maxX,y],[maxX,y]],palette["--grid"]);if(y)text(X(0)+5,Y(y)-4,''+y);}line([[-maxX,0],[maxX,0]],palette["--axis"]);line([[0,-maxY],[0,maxY]],palette["--axis"]);text(X(maxX)-8,Y(0)-8,'x');text(X(0)+8,Y(maxY)+9,'y');ctx.save();ctx.beginPath();ctx.rect(16,16,w-32,H-32);ctx.clip();
-if($('assintotas').checked)for(const s of [-1,1])line([[-100,k+s*b/a*(-100-h)],[100,k+s*b/a*(100-h)]],palette["--asym"],2,[8,6]);if($('retangulo').checked)line([[h-a,k-b],[h+a,k-b],[h+a,k+b],[h-a,k+b],[h-a,k-b]],palette["--axis"],1,[3,5]);
-for(const side of [-1,1]){const branch=(()=>{const base=side<0?0:2*n-1,branch=[];for(let i=n-1;i>=1;i--)branch.push(stored[base+2*i]);branch.push(stored[base]);for(let i=1;i<n;i++)branch.push(stored[base+2*i-1]);return branch;})();hitBranches.push({side,points:branch.map(([x,y])=>({x,y,px:X(x),py:Y(y)}))});line(branch,palette["--curve"],3.5);if($('pontos').checked)for(const [x,y]of branch){ctx.fillStyle=palette["--curve"];ctx.beginPath();ctx.arc(X(x),Y(y),2.5,0,Math.PI*2);ctx.fill();}}
-function mark(x,y,label,color,diamond){const px=X(x),py=Y(y);hitMarkers.push({x,y,px,py,label:label.startsWith("F")?"Foco "+label:label.startsWith("V")?"Vértice "+label:"Centro"});ctx.fillStyle=color;ctx.beginPath();if(diamond){ctx.moveTo(px,py-6);ctx.lineTo(px+6,py);ctx.lineTo(px,py+6);ctx.lineTo(px-6,py);ctx.closePath();}else ctx.arc(px,py,6,0,Math.PI*2);ctx.fill();const labelY=py+(diamond?-30:label==='C'?32:38),labelX=px-9;
-ctx.font='600 15px system-ui';ctx.fillStyle=palette['--bg'];ctx.fillRect(labelX-4,labelY-16,27,22);ctx.fillStyle=color;ctx.fillText(label,labelX,labelY);
-}
-if($('focos').checked){mark(h-c,k,'F₁',palette["--focus"],true);mark(h+c,k,'F₂',palette["--focus"],true);}if($('vertices').checked){mark(h-a,k,'V₁',palette["--vertex"],false);mark(h+a,k,'V₂',palette["--vertex"],false);}mark(h,k,'C',palette["--muted"],false);ctx.restore();
-const term=(v,name)=>v===0?name:`(${name} ${v<0?'+':'−'} ${fmt(Math.abs(v),1)})`;$('equation').innerHTML=`<span class="frac"><span>${term(h,'x')}²</span><span>${fmt(a,1)}²</span></span><span>−</span><span class="frac"><span>${term(k,'y')}²</span><span>${fmt(b,1)}²</span></span><span>= 1</span>`;
-$('substitution').innerHTML=`<span>a² = ${fmt(a,1)}² = <strong>${fmt(a*a)}</strong></span><span>b² = ${fmt(b,1)}² = <strong>${fmt(b*b)}</strong></span><span>Centro: <strong>(${fmt(h,1)}; ${fmt(k,1)})</strong></span>`;
-const A=b*b,B=-a*a,D=-2*b*b*h,E=2*a*a*k,F=b*b*h*h-a*a*k*k-a*a*b*b;
-function polynomial(terms){let out='';for(const [raw,name] of terms){const v=Math.round(raw*10000)/10000;if(v===0)continue;const magnitude=Math.abs(v),num=(magnitude===1&&name)?'':compactFormat.format(magnitude);out+=(out?(v<0?' − ':' + '):(v<0?'−':''))+num+name;}return out||'0';}
-$('results').innerHTML=`<p><strong>Forma geral</strong><br>${polynomial([[A,'x²'],[B,'y²'],[D,'x'],[E,'y'],[F,'']])} = 0</p><p><strong>Focos</strong><br>c = √(a² + b²) = √(${fmt(a*a)} + ${fmt(b*b)}) = √${fmt(a*a+b*b)} ≈ ${fmt(c,3)}</p><p><strong>Assíntotas</strong><br>${term(k,'y')} = ± (${fmt(b,1)} / ${fmt(a,1)}) · ${term(h,'x')}<br>Inclinações ≈ ±${fmt(b/a,3)}</p>`;
-$('mc').textContent=fmt(c,3);$('me').textContent=fmt(c/a,3);$('mp').textContent=stored.length;const pointRow=(name,formula,x,y,approx=false)=>`<div class="point-row"><strong>${name}</strong><div class="point-formula">${formula}</div><div class="point-coordinates"><span>x ${approx?'≈':'='} <b>${fmt(x,approx?3:1)}</b></span><span>y = <b>${fmt(y,1)}</b></span></div></div>`;
-$('elements').innerHTML=`<section class="point-group"><h3 class="vertex-title">● Vértices</h3>${pointRow('V₁ · esquerdo','(h − a, k)',h-a,k)}${pointRow('V₂ · direito','(h + a, k)',h+a,k)}</section><section class="point-group"><h3 class="focus-title">◆ Focos</h3>${pointRow('F₁ · esquerdo','(h − c, k)',h-c,k,true)}${pointRow('F₂ · direito','(h + c, k)',h+c,k,true)}<p class="precision">c = √(a² + b²) ≈ ${fmt(c,3)}</p></section>`;canvas.setAttribute('aria-label',`Hipérbole: a=${a}, b=${b}, centro (${h}, ${k}), distância focal ${c.toFixed(3)}.`);updateTableLater();}
+function updateTableLater() {
+  clearTimeout(tableTimer);
 
-function showHover(){
- hoverFrame=0;if(!pointer||!chartView)return;
- const {x:mx,y:my}=pointer,{w,H}=chartView;
- const inside=p=>p.px>=16&&p.px<=w-16&&p.py>=16&&p.py<=H-16;
- const nearby=hitMarkers.filter(p=>inside(p)&&Math.hypot(p.px-mx,p.py-my)<=12).sort((p,q)=>Math.hypot(p.px-mx,p.py-my)-Math.hypot(q.px-mx,q.py-my));
- let best=null,text='';
- if(nearby.length){best=nearby[0];text=nearby.map(p=>`${p.label}\nx = ${fmt(p.x,3)}   y = ${fmt(p.y,3)}`).join('\n');}
- else{
-  let distance=10;
-  for(const branch of hitBranches)for(let i=1;i<branch.points.length;i++){
-   const p=branch.points[i-1],q=branch.points[i],dx=q.px-p.px,dy=q.py-p.py,len=dx*dx+dy*dy;
-   const t=len?Math.max(0,Math.min(1,((mx-p.px)*dx+(my-p.py)*dy)/len)):0;
-   const px=p.px+t*dx,py=p.py+t*dy,d=Math.hypot(mx-px,my-py);
-   if(d<distance&&inside({px,py})){distance=d;best={px,py,x:p.x+t*(q.x-p.x),y:p.y+t*(q.y-p.y)};text=`Hipérbole · ramo ${branch.side<0?'esquerdo':'direito'}\nx ≈ ${fmt(best.x,3)}   y ≈ ${fmt(best.y,3)}\nAproximação no segmento desenhado`;}
+  if ($("table-details").open) {
+    tableTimer = setTimeout(table, 140);
   }
- }
- const tip=$('chart-tip'),dot=$('hover-dot');
- if(!best){tip.hidden=true;dot.hidden=true;return;}
- tip.textContent=text;tip.hidden=false;dot.hidden=false;
- dot.style.left=best.px+'px';dot.style.top=best.py+'px';
- tip.style.left=Math.max(8,Math.min(best.px+18,w-tip.offsetWidth-8))+'px';
- tip.style.top=Math.max(8,Math.min(best.py+18,H-tip.offsetHeight-8))+'px';
 }
-canvas.addEventListener('pointermove',event=>{const rect=canvas.getBoundingClientRect();pointer={x:event.clientX-rect.left,y:event.clientY-rect.top};if(!hoverFrame)hoverFrame=requestAnimationFrame(showHover);});
-canvas.addEventListener('pointerleave',hideHover);
-canvas.addEventListener('pointerdown',event=>{const rect=canvas.getBoundingClientRect();pointer={x:event.clientX-rect.left,y:event.clientY-rect.top};showHover();});
 
-function schedule(){if(!pending){pending=true;requestAnimationFrame(draw);}}document.querySelectorAll('input').forEach(el=>el.addEventListener('input',schedule));$('reset').onclick=()=>{for(const [id,v]of Object.entries({a:3,b:2,h:0,k:0,n:150}))$(id).value=v;schedule();};$('csv').onclick=()=>{draw();const blob=new Blob(['x,y\n'+stored.map(p=>p.join(',')).join('\n')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='pontos_hiperbole.csv';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};$('table-details').addEventListener('toggle',table);new ResizeObserver(schedule).observe(canvas.parentElement);
-function theme(value){document.documentElement.dataset.theme=value;for(const t of ['light','dark'])$(t).setAttribute('aria-pressed',String(t===value));try{localStorage.setItem('gaal-theme',value);}catch{}schedule();}
-$('light').onclick=()=>theme('light');$('dark').onclick=()=>theme('dark');
-let saved;try{saved=localStorage.getItem('gaal-theme');}catch{}theme(saved==='light'||saved==='dark'?saved:(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'));
-$('fullscreen').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch{$('status').textContent='Use F11 para alternar a tela inteira neste navegador.';}};
-document.addEventListener('fullscreenchange',()=>{$('fullscreen').textContent=document.fullscreenElement?'Sair da tela inteira':'Tela inteira';schedule();});draw();
-</script></html>
+function calcularPontos(h, k, a, b, limite, n) {
+  const points = [];
+
+  for (const lado of [-1, 1]) {
+    for (let i = 0; i < n; i++) {
+      const d = a + ((limite - a) * i) / (n - 1);
+      const x = h + lado * d;
+      const altura = b * Math.sqrt(Math.max(0, (d / a) ** 2 - 1));
+
+      points.push([x, k + altura]);
+      if (altura !== 0) {
+        points.push([x, k - altura]);
+      }
+    }
+  }
+
+  return points;
+}
+
+function table() {
+  if (!$("table-details").open) {
+    return;
+  }
+
+  $("rows").innerHTML = stored
+    .map(
+      ([x, y]) =>
+        `<tr><td>${fmt(x, 4)}</td><td>${fmt(y, 4)}</td></tr>`,
+    )
+    .join("");
+}
+function draw() {
+  pending = false;
+  hideHover();
+  hitMarkers = [];
+  hitBranches = [];
+
+  const styles = getComputedStyle(document.documentElement);
+  const palette = Object.fromEntries(
+    [
+      "--fg",
+      "--bg",
+      "--panel",
+      "--border",
+      "--curve",
+      "--button",
+      "--axis",
+      "--muted",
+      "--focus",
+      "--vertex",
+      "--asym",
+      "--grid",
+    ].map((key) => [key, styles.getPropertyValue(key).trim()]),
+  );
+  const a = +$("a").value;
+  const b = +$("b").value;
+  const h = +$("h").value;
+  const k = +$("k").value;
+  const n = +$("n").value;
+  const c = Math.hypot(a, b);
+
+  for (const id of ["a", "b", "h", "k", "n"]) {
+    $("o" + id).value = fmt(+$(id).value, id === "n" ? 0 : 1);
+  }
+  stored = calcularPontos(h, k, a, b, 20, n);
+
+  const width = canvas.clientWidth;
+  const height = canvas.clientHeight;
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  const pixelWidth = Math.round(width * devicePixelRatio);
+  const pixelHeight = Math.round(height * devicePixelRatio);
+
+  if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+    canvas.width = pixelWidth;
+    canvas.height = pixelHeight;
+  }
+
+  ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  ctx.clearRect(0, 0, width, height);
+
+  const scale = Math.min((width - 52) / 24, (height - 48) / 12);
+  const X = (x) => width / 2 + x * scale;
+  const Y = (y) => height / 2 - y * scale;
+  chartView = { w: width, H: height, scale, X, Y };
+
+  function line(points, color, lineWidth = 1, dash = []) {
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth;
+    ctx.setLineDash(dash);
+    points.forEach(([x, y], index) => {
+      if (index) {
+        ctx.lineTo(X(x), Y(y));
+      } else {
+        ctx.moveTo(X(x), Y(y));
+      }
+    });
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  function text(x, y, value) {
+    ctx.fillStyle = palette["--muted"];
+    ctx.font = "14px system-ui";
+    ctx.fillText(value, x, y);
+  }
+
+  const maxX = (width / 2 - 20) / scale;
+  const maxY = (height / 2 - 20) / scale;
+  const step = width < 450 ? 4 : 2;
+
+  for (let x = Math.ceil(-maxX / step) * step; x < maxX; x += step) {
+    line(
+      [
+        [x, -maxY],
+        [x, maxY],
+      ],
+      palette["--grid"],
+    );
+    if (x) {
+      text(X(x) + 3, Y(0) + 16, "" + x);
+    }
+  }
+
+  for (let y = Math.ceil(-maxY / step) * step; y < maxY; y += step) {
+    line(
+      [
+        [-maxX, y],
+        [maxX, y],
+      ],
+      palette["--grid"],
+    );
+    if (y) {
+      text(X(0) + 5, Y(y) - 4, "" + y);
+    }
+  }
+
+  line(
+    [
+      [-maxX, 0],
+      [maxX, 0],
+    ],
+    palette["--axis"],
+  );
+  line(
+    [
+      [0, -maxY],
+      [0, maxY],
+    ],
+    palette["--axis"],
+  );
+  text(X(maxX) - 8, Y(0) - 8, "x");
+  text(X(0) + 8, Y(maxY) + 9, "y");
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(16, 16, width - 32, height - 32);
+  ctx.clip();
+
+  if ($("assintotas").checked) {
+    for (const direction of [-1, 1]) {
+      line(
+        [
+          [-100, k + (direction * b * (-100 - h)) / a],
+          [100, k + (direction * b * (100 - h)) / a],
+        ],
+        palette["--asym"],
+        2,
+        [8, 6],
+      );
+    }
+  }
+
+  if ($("retangulo").checked) {
+    line(
+      [
+        [h - a, k - b],
+        [h + a, k - b],
+        [h + a, k + b],
+        [h - a, k + b],
+        [h - a, k - b],
+      ],
+      palette["--axis"],
+      1,
+      [3, 5],
+    );
+  }
+
+  for (const side of [-1, 1]) {
+    const base = side < 0 ? 0 : 2 * n - 1;
+    const branch = [];
+
+    for (let i = n - 1; i >= 1; i--) {
+      branch.push(stored[base + 2 * i]);
+    }
+    branch.push(stored[base]);
+    for (let i = 1; i < n; i++) {
+      branch.push(stored[base + 2 * i - 1]);
+    }
+
+    hitBranches.push({
+      side,
+      points: branch.map(([x, y]) => ({ x, y, px: X(x), py: Y(y) })),
+    });
+    line(branch, palette["--curve"], 3.5);
+
+    if ($("pontos").checked) {
+      for (const [x, y] of branch) {
+        ctx.fillStyle = palette["--curve"];
+        ctx.beginPath();
+        ctx.arc(X(x), Y(y), 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+
+  function mark(x, y, label, color, diamond) {
+    const px = X(x);
+    const py = Y(y);
+    const description = label.startsWith("F")
+      ? "Foco " + label
+      : label.startsWith("V")
+        ? "Vértice " + label
+        : "Centro";
+
+    hitMarkers.push({ x, y, px, py, label: description });
+    ctx.fillStyle = color;
+    ctx.beginPath();
+
+    if (diamond) {
+      ctx.moveTo(px, py - 6);
+      ctx.lineTo(px + 6, py);
+      ctx.lineTo(px, py + 6);
+      ctx.lineTo(px - 6, py);
+      ctx.closePath();
+    } else {
+      ctx.arc(px, py, 6, 0, Math.PI * 2);
+    }
+
+    ctx.fill();
+    const labelY = py + (diamond ? -30 : label === "C" ? 32 : 38);
+    const labelX = px - 9;
+    ctx.font = "600 15px system-ui";
+    ctx.fillStyle = palette["--bg"];
+    ctx.fillRect(labelX - 4, labelY - 16, 27, 22);
+    ctx.fillStyle = color;
+    ctx.fillText(label, labelX, labelY);
+  }
+
+  if ($("focos").checked) {
+    mark(h - c, k, "F₁", palette["--focus"], true);
+    mark(h + c, k, "F₂", palette["--focus"], true);
+  }
+  if ($("vertices").checked) {
+    mark(h - a, k, "V₁", palette["--vertex"], false);
+    mark(h + a, k, "V₂", palette["--vertex"], false);
+  }
+  mark(h, k, "C", palette["--muted"], false);
+  ctx.restore();
+
+  const term = (value, name) =>
+    value === 0
+      ? name
+      : `(${name} ${value < 0 ? "+" : "−"} ${fmt(Math.abs(value), 1)})`;
+
+  $("equation").innerHTML = `
+    <span class="frac">
+      <span>${term(h, "x")}²</span>
+      <span>${fmt(a, 1)}²</span>
+    </span>
+    <span>−</span>
+    <span class="frac">
+      <span>${term(k, "y")}²</span>
+      <span>${fmt(b, 1)}²</span>
+    </span>
+    <span>= 1</span>
+  `;
+  $("substitution").innerHTML = `
+    <span>a² = ${fmt(a, 1)}² = <strong>${fmt(a * a)}</strong></span>
+    <span>b² = ${fmt(b, 1)}² = <strong>${fmt(b * b)}</strong></span>
+    <span>Centro: <strong>(${fmt(h, 1)}; ${fmt(k, 1)})</strong></span>
+  `;
+
+  const A = b * b;
+  const B = -(a * a);
+  const D = -2 * b * b * h;
+  const E = 2 * a * a * k;
+  const F = b * b * h * h - a * a * k * k - a * a * b * b;
+
+  function polynomial(terms) {
+    let output = "";
+
+    for (const [rawValue, name] of terms) {
+      const value = Math.round(rawValue * 10000) / 10000;
+      if (value === 0) {
+        continue;
+      }
+
+      const magnitude = Math.abs(value);
+      const number = magnitude === 1 && name ? "" : compactFormat.format(magnitude);
+      const sign = output ? (value < 0 ? " − " : " + ") : value < 0 ? "−" : "";
+      output += sign + number + name;
+    }
+
+    return output || "0";
+  }
+
+  $("results").innerHTML = `
+    <p>
+      <strong>Forma geral</strong><br>
+      ${polynomial([
+        [A, "x²"],
+        [B, "y²"],
+        [D, "x"],
+        [E, "y"],
+        [F, ""],
+      ])} = 0
+    </p>
+    <p>
+      <strong>Focos</strong><br>
+      c = √(a² + b²) = √(${fmt(a * a)} + ${fmt(b * b)})
+      = √${fmt(a * a + b * b)} ≈ ${fmt(c, 3)}
+    </p>
+    <p>
+      <strong>Assíntotas</strong><br>
+      ${term(k, "y")} = ± (${fmt(b, 1)} / ${fmt(a, 1)}) · ${term(h, "x")}<br>
+      Inclinações ≈ ±${fmt(b / a, 3)}
+    </p>
+  `;
+
+  $("mc").textContent = fmt(c, 3);
+  $("me").textContent = fmt(c / a, 3);
+  $("mp").textContent = stored.length;
+
+  const pointRow = (name, formula, x, y, approx = false) => `
+    <div class="point-row">
+      <strong>${name}</strong>
+      <div class="point-formula">${formula}</div>
+      <div class="point-coordinates">
+        <span>x ${approx ? "≈" : "="} <b>${fmt(x, approx ? 3 : 1)}</b></span>
+        <span>y = <b>${fmt(y, 1)}</b></span>
+      </div>
+    </div>
+  `;
+
+  $("elements").innerHTML = `
+    <section class="point-group">
+      <h3 class="vertex-title">● Vértices</h3>
+      ${pointRow("V₁ · esquerdo", "(h − a, k)", h - a, k)}
+      ${pointRow("V₂ · direito", "(h + a, k)", h + a, k)}
+    </section>
+    <section class="point-group">
+      <h3 class="focus-title">◆ Focos</h3>
+      ${pointRow("F₁ · esquerdo", "(h − c, k)", h - c, k, true)}
+      ${pointRow("F₂ · direito", "(h + c, k)", h + c, k, true)}
+      <p class="precision">c = √(a² + b²) ≈ ${fmt(c, 3)}</p>
+    </section>
+  `;
+  canvas.setAttribute(
+    "aria-label",
+    `Hipérbole: a=${a}, b=${b}, centro (${h}, ${k}), distância focal ${c.toFixed(3)}.`,
+  );
+  updateTableLater();
+}
+
+function showHover() {
+  hoverFrame = 0;
+  if (!pointer || !chartView) {
+    return;
+  }
+
+  const { x: mouseX, y: mouseY } = pointer;
+  const { w: width, H: height } = chartView;
+  const inside = (point) =>
+    point.px >= 16 &&
+    point.px <= width - 16 &&
+    point.py >= 16 &&
+    point.py <= height - 16;
+  const nearby = hitMarkers
+    .filter(
+      (point) =>
+        inside(point) &&
+        Math.hypot(point.px - mouseX, point.py - mouseY) <= 12,
+    )
+    .sort(
+      (pointA, pointB) =>
+        Math.hypot(pointA.px - mouseX, pointA.py - mouseY) -
+        Math.hypot(pointB.px - mouseX, pointB.py - mouseY),
+    );
+
+  let best = null;
+  let tooltipText = "";
+
+  if (nearby.length) {
+    best = nearby[0];
+    tooltipText = nearby
+      .map(
+        (point) =>
+          `${point.label}\nx = ${fmt(point.x, 3)}   y = ${fmt(point.y, 3)}`,
+      )
+      .join("\n");
+  } else {
+    let distance = 10;
+
+    for (const branch of hitBranches) {
+      for (let i = 1; i < branch.points.length; i++) {
+        const pointA = branch.points[i - 1];
+        const pointB = branch.points[i];
+        const dx = pointB.px - pointA.px;
+        const dy = pointB.py - pointA.py;
+        const lengthSquared = dx * dx + dy * dy;
+        const projection = lengthSquared
+          ? Math.max(
+              0,
+              Math.min(
+                1,
+                ((mouseX - pointA.px) * dx + (mouseY - pointA.py) * dy) /
+                  lengthSquared,
+              ),
+            )
+          : 0;
+        const px = pointA.px + projection * dx;
+        const py = pointA.py + projection * dy;
+        const currentDistance = Math.hypot(mouseX - px, mouseY - py);
+
+        if (currentDistance < distance && inside({ px, py })) {
+          distance = currentDistance;
+          best = {
+            px,
+            py,
+            x: pointA.x + projection * (pointB.x - pointA.x),
+            y: pointA.y + projection * (pointB.y - pointA.y),
+          };
+          tooltipText = `Hipérbole · ramo ${branch.side < 0 ? "esquerdo" : "direito"}
+x ≈ ${fmt(best.x, 3)}   y ≈ ${fmt(best.y, 3)}
+Aproximação no segmento desenhado`;
+        }
+      }
+    }
+  }
+
+  const tooltip = $("chart-tip");
+  const dot = $("hover-dot");
+  if (!best) {
+    tooltip.hidden = true;
+    dot.hidden = true;
+    return;
+  }
+
+  tooltip.textContent = tooltipText;
+  tooltip.hidden = false;
+  dot.hidden = false;
+  dot.style.left = best.px + "px";
+  dot.style.top = best.py + "px";
+  tooltip.style.left =
+    Math.max(8, Math.min(best.px + 18, width - tooltip.offsetWidth - 8)) + "px";
+  tooltip.style.top =
+    Math.max(8, Math.min(best.py + 18, height - tooltip.offsetHeight - 8)) +
+    "px";
+}
+
+canvas.addEventListener("pointermove", (event) => {
+  const rect = canvas.getBoundingClientRect();
+  pointer = {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top,
+  };
+  if (!hoverFrame) {
+    hoverFrame = requestAnimationFrame(showHover);
+  }
+});
+canvas.addEventListener("pointerleave", hideHover);
+canvas.addEventListener("pointerdown", (event) => {
+  const rect = canvas.getBoundingClientRect();
+  pointer = {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top,
+  };
+  showHover();
+});
+
+function schedule() {
+  if (!pending) {
+    pending = true;
+    requestAnimationFrame(draw);
+  }
+}
+
+document.querySelectorAll("input").forEach((element) => {
+  element.addEventListener("input", schedule);
+});
+
+$("reset").onclick = () => {
+  for (const [id, value] of Object.entries({ a: 3, b: 2, h: 0, k: 0, n: 150 })) {
+    $(id).value = value;
+  }
+  schedule();
+};
+
+$("csv").onclick = () => {
+  draw();
+  const csv = ["x,y", ...stored.map((point) => point.join(","))].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "pontos_hiperbole.csv";
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+
+$("table-details").addEventListener("toggle", table);
+new ResizeObserver(schedule).observe(canvas.parentElement);
+
+function theme(value) {
+  document.documentElement.dataset.theme = value;
+  for (const selectedTheme of ["light", "dark"]) {
+    $(selectedTheme).setAttribute(
+      "aria-pressed",
+      String(selectedTheme === value),
+    );
+  }
+
+  try {
+    localStorage.setItem("gaal-theme", value);
+  } catch {}
+
+  schedule();
+}
+
+$("light").onclick = () => theme("light");
+$("dark").onclick = () => theme("dark");
+
+let saved;
+try {
+  saved = localStorage.getItem("gaal-theme");
+} catch {}
+
+const preferredTheme = matchMedia("(prefers-color-scheme: light)").matches
+  ? "light"
+  : "dark";
+theme(saved === "light" || saved === "dark" ? saved : preferredTheme);
+
+$("fullscreen").onclick = async () => {
+  try {
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+    } else {
+      await document.documentElement.requestFullscreen();
+    }
+  } catch {
+    $("status").textContent =
+      "Use F11 para alternar a tela inteira neste navegador.";
+  }
+};
+
+document.addEventListener("fullscreenchange", () => {
+  $("fullscreen").textContent = document.fullscreenElement
+    ? "Sair da tela inteira"
+    : "Tela inteira";
+  schedule();
+});
+
+draw();
+</script>
+  </body>
+</html>
