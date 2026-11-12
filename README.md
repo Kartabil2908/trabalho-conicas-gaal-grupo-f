@@ -17,9 +17,16 @@ Os vértices são (±3, 0), os focos são (±√13, 0) e as assíntotas são y =
 Mude um parâmetro por vez e mostre onde ele entra na equação.
 Marque “Pontos calculados” e reduza as amostras para explicar a construção.
 
+## GitHub Pages
+
+Depois de ativar a publicação, o site poderá ser acessado em
+<https://kartabil2908.github.io/trabalho-conicas-gaal-grupo-f/>.
+Em **Settings → Pages → Build and deployment**, selecione **GitHub Actions** como origem.
+Depois, cada alteração enviada para `main` publica automaticamente os arquivos da apresentação.
+
 ## Cálculo
 
-O navegador executa o procedimento de `calcularPontos` em `apresentacao.html`:
+O navegador executa o procedimento de `gerarPontosDaHiperbole` em `apresentacao.js`:
 recebe parâmetros, calcula coordenadas, armazena pares e desenha cada ramo separadamente.
 O limite horizontal de amostragem é 20 e os eixos usam a mesma escala.
 O arquivo original `hiperbole_grupo_f.py` permanece como referência do cálculo em Python.
